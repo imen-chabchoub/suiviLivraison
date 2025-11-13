@@ -1,0 +1,44 @@
+# Dossier d'historique VS Code
+.history/
+
+# Fichiers de configuration Expo
+.expo/
+.expo-shared/
+
+# NE PAS IGNORER node_modules/ - ils sont nécessaires!
+# node_modules/  ← À RETIRER ou COMMENTER
+
+# Fichiers de log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environnements
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Cache
+.cache/
+*.tmp
+*.temp
+
+# Système
+.DS_Store
+Thumbs.db
+
+# Build (générés automatiquement)
+dist/
+build/
+web-build/
+
+# Android (générés automatiquement)
+android/.gradle
+android/app/build/
+android/build/
+
+# iOS (générés automatiquement)
+ios/build/
+Pods/
