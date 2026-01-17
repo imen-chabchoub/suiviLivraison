@@ -43,7 +43,7 @@ export default function LoginScreen() {
       return;
     }
 
-    if (!role || role.toUpperCase() !== 'LIVREUR') {
+    if (!role || role.toUpperCase() !== 'ROLE_LIVREUR') {
       Alert.alert("Accès refusé", "Cet utilisateur n'est pas un livreur");
       return;
     }
