@@ -174,39 +174,59 @@ export default function MapScreen() {
     startLocationTracking();
   };
 
-  const startLocationTracking = async () => {
-    locationWatchRef.current = await Location.watchPositionAsync(
-      {
-        accuracy: Location.Accuracy.High,
-        timeInterval: 3000,
-        distanceInterval: 5,
-      },
-      (location) => {
-        const newLocation = {
-          latitude: location.coords.latitude,
-          longitude: location.coords.longitude,
-        };
+const startLocationTracking = async () => {
+  const userId = await AsyncStorage.getItem('userId');
+  
+  locationWatchRef.current = await Location.watchPositionAsync(
+    {
+      accuracy: Location.Accuracy.High,
+      timeInterval: 3000,    // Vérifie toutes les 3 secondes
+      distanceInterval: 5,   // Ou si déplacement > 5m
+    },
+    async (location) => {
+      const newLocation = {
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+      };
 
-        setCurrentLocation(newLocation);
+      setCurrentLocation(newLocation);
 
-        if (destination) {
-          const realDistance = calculateHaversineDistance(
-            newLocation,
-            destination,
-          );
-          setDistance(`${realDistance.toFixed(2)} km`);
-          setEstimatedTime(`${Math.round(realDistance * 5)} min`);
-        }
+      // 🚀 ENVOYER LA POSITION AU BACKEND
+      try {
+        await apiMobile.post('/mobile/positions/record', 
+          {
+            latitude: newLocation.latitude,
+            longitude: newLocation.longitude,
+          },
+          {
+            params: { livreurId: userId }
+          }
+        );
+        console.log('✅ Position enregistrée:', newLocation);
+      } catch (error) {
+        console.error('❌ Erreur envoi position:', error?.response?.data || error);
+      }
 
-        if (webViewRef.current && isTracking) {
-          webViewRef.current.injectJavaScript(`
-            updateUserPosition(${newLocation.latitude}, ${newLocation.longitude});
-            true;
-          `);
-        }
-      },
-    );
-  };
+      // Mettre à jour la distance et le temps
+      if (destination) {
+        const realDistance = calculateHaversineDistance(
+          newLocation,
+          destination,
+        );
+        setDistance(`${realDistance.toFixed(2)} km`);
+        setEstimatedTime(`${Math.round(realDistance * 5)} min`);
+      }
+
+      // Mettre à jour la carte
+      if (webViewRef.current && isTracking) {
+        webViewRef.current.injectJavaScript(`
+          updateUserPosition(${newLocation.latitude}, ${newLocation.longitude});
+          true;
+        `);
+      }
+    },
+  );
+};
 
   const handleArrival = () => {
     Alert.alert('Arrivé à destination', 'Voulez-vous confirmer votre arrivée?', [
