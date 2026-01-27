@@ -54,9 +54,18 @@ const [loading, setLoading] = useState(false);
     fetchAssignedDeliveries();
   }, []);
 
-  const handleStart = (d) => router.push('/MapScreen');
-  const handleMap = (d) => router.push('/MapScreen');
-  const handleScan = (d) => router.push('/ScanScreen');
+  const handleStart = (d) => router.push({
+    pathname: '/MapScreen',
+    params: { deliveryId: d.raw.id }
+  });
+  const handleMap = (d) => router.push({
+    pathname: '/MapScreen',
+    params: { deliveryId: d.raw.id }
+  });
+  const handleScan = (d) => router.push({
+    pathname: '/ScanScreen',
+    params: { deliveryId: d.raw.id }
+  });
 
   // Fonction pour gérer le changement d'onglet
   const handleTabChange = (tabName) => {

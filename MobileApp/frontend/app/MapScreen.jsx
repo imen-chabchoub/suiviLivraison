@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { WebView } from 'react-native-webview';
 import * as Location from 'expo-location';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import apiMobile from '../app/apiMobile';
@@ -21,6 +21,7 @@ import { getRoute } from '../app/routing';
 const { width, height } = Dimensions.get('window');
 
 export default function MapScreen() {
+  const { deliveryId } = useLocalSearchParams();
   const [currentLocation, setCurrentLocation] = useState(null);
   const [destination, setDestination] = useState(null);
   const [currentDelivery, setCurrentDelivery] = useState(null);
@@ -38,7 +39,7 @@ export default function MapScreen() {
         locationWatchRef.current.remove();
       }
     };
-  }, []);
+  }, [deliveryId]);
 
   const loadDeliveryAndInit = async () => {
     try {
@@ -64,7 +65,14 @@ export default function MapScreen() {
         return;
       }
 
-      const l = livraisons[0];
+      // Chercher la livraison spécifique par ID, sinon prendre la première
+      let l = livraisons[0];
+      if (deliveryId) {
+        const found = livraisons.find(liv => liv.id.toString() === deliveryId.toString());
+        if (found) {
+          l = found;
+        }
+      }
 
       const address =
         l.adresse || (l.client ? l.client.adresse : '') || 'Paris, France';

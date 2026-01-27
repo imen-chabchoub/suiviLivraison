@@ -3,7 +3,7 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // À adapter selon où tourne ton backend :
-const BASE_URL = 'http://192.168.0.144:8080'; 
+const BASE_URL = 'http://10.42.81.141:8080'; 
 // Android émulateur: 10.0.2.2
 // iOS simulateur: http://localhost:8080
 // Téléphone réel: http://IP_DE_TON_PC:8080
