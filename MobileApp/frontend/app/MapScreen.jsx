@@ -237,7 +237,10 @@ const startLocationTracking = async () => {
           if (locationWatchRef.current) {
             locationWatchRef.current.remove();
           }
-          router.push('/ProofDelivery');
+          router.push({
+            pathname: '/ProofDelivery',
+            params: { deliveryId: currentDelivery.id }
+          });
         },
       },
     ]);
@@ -508,7 +511,10 @@ const startLocationTracking = async () => {
 
               <TouchableOpacity
                 style={styles.scanButton}
-                onPress={() => router.push('/ScanScreen')}
+                onPress={() => router.push({
+                  pathname: '/ScanScreen',
+                  params: { deliveryId: currentDelivery.id }
+                })}
                 activeOpacity={0.8}
               >
                 <Ionicons name="barcode-outline" size={20} color="#fff" />

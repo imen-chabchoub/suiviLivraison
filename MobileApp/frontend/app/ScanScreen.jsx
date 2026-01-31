@@ -12,7 +12,7 @@ import {
   TextInput,
   Modal
 } from 'react-native';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -20,6 +20,7 @@ import apiMobile from '../app/apiMobile';
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
 export default function ScanPage() {
+  const { deliveryId } = useLocalSearchParams();
   const [permission, requestPermission] = useCameraPermissions();
   const [isScanning, setIsScanning] = useState(true);
   const [scannedData, setScannedData] = useState(null);
@@ -59,11 +60,20 @@ const loadCurrentDelivery = async () => {
       return;
     }
 
-    const l = livraisons[0]; // prend la première en cours, à affiner si besoin
+    const l = livraisons.find(liv => liv.id === Number(deliveryId));
+
+    if (!l) {
+      Alert.alert(
+        'Livraison non trouvée',
+        "La livraison sélectionnée n'existe pas.",
+        [{ text: 'OK', onPress: () => router.back() }]
+      );
+      return;
+    }
 
     setCurrentDelivery({
       id: l.id,
-      packageId: l.codeBarre || `LIV-${l.id}`,
+      packageId: l.codeBarre || `BAR-${l.id}`,
       expectedBarcode: l.codeBarre,
       destination: l.adresse || (l.client ? l.client.adresse : ''),
       client: l.client ? `${l.client.prenom} ${l.client.nom}` : 'Client',
@@ -123,7 +133,10 @@ const ok = typeof message === 'string' && message.toLowerCase().includes('valid'
       Alert.alert(
         '✅ Code-barres validé !',
         `Colis ${barcodeData} correspond à la livraison prévue.`,
-        [{ text: 'Continuer', onPress: () => router.push('/MapScreen') }]
+        [{ text: 'Continuer', onPress: () => router.push({
+          pathname: '/MapScreen',
+          params: { deliveryId: currentDelivery.id }
+        }) }]
       );
     } else {
       Alert.alert(

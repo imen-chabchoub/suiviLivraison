@@ -11,7 +11,7 @@ import {
   Image,
   ActivityIndicator,
 } from 'react-native';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import * as Location from 'expo-location';
@@ -19,6 +19,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import apiMobile from '../app/apiMobile';
 
 export default function ProofDelivery() {
+  const { deliveryId } = useLocalSearchParams();
   const [photo, setPhoto] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [currentLocation, setCurrentLocation] = useState(null);
@@ -47,7 +48,16 @@ export default function ProofDelivery() {
           return;
         }
 
-        const l = livraisons[0];
+        const l = livraisons.find(liv => liv.id === Number(deliveryId));
+
+        if (!l) {
+          Alert.alert(
+            'Livraison non trouvée',
+            "La livraison sélectionnée n'existe pas.",
+            [{ text: 'OK', onPress: () => router.back() }],
+          );
+          return;
+        }
 
         setDeliveryData({
           id: l.id,
@@ -215,7 +225,10 @@ export default function ProofDelivery() {
         {
           text: 'OK',
           onPress: () => {
-            router.push('/HistoryScreen');
+            router.push({
+              pathname: '/HomeScreen',
+              params: { activeTab: 'Historique' }
+            });
           },
         },
       ]

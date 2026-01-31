@@ -11,12 +11,13 @@ import { Ionicons } from '@expo/vector-icons';
 import DeliveryCard from '../components/DeliveryCard';
 import EvaluationsScreen from './EvaluationsScreen';
 import HistoryScreen from './HistoryScreen';
-import { router } from 'expo-router'; 
+import { router, useLocalSearchParams } from 'expo-router'; 
 import apiMobile from '../app/apiMobile';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 export default function HomeScreen() {
+  const { activeTab: initialTab } = useLocalSearchParams();
   const [deliveries, setDeliveries] = useState([]);
-  const [activeTab, setActiveTab] = useState('Livraisons');
+  const [activeTab, setActiveTab] = useState(initialTab || 'Livraisons');
 const [loading, setLoading] = useState(false);
 
   const fetchAssignedDeliveries = async () => {
